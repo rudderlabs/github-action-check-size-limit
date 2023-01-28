@@ -1,5 +1,5 @@
 {
-  "name": "size-limit-action",
+  "name": "github-action-check-size-limit",
   "version": "2.0.0",
   "private": true,
   "description": "size-limit action",

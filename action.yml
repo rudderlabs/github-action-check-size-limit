@@ -1,4 +1,4 @@
-name: 'size-limit-action'
+name: 'github-action-check-size-limit'
 description: 'size-limit action'
 author: 'Andres Alvarez <a.alvarez.sor@gmail.com>'
 branding:
