@@ -31596,7 +31596,24 @@ class SizeLimit {
     }
     parseResults(output) {
         const results = JSON.parse(output);
-        return results.reduce((current, result) => {
+        // flatten the inner array values if any
+        // From
+        // [
+        //   [{ name: 'a', size: 1 }, { name: 'b', size: 2 }],
+        //   [{ name: 'c', size: 1 }, { name: 'd', size: 2 }],
+        // ]
+        // To
+        // [{ name: 'a', size: 1 }, { name: 'b', size: 2 }, { name: 'c', size: 1 }, { name: 'd', size: 2 }]
+        let updatedResults = [];
+        results.forEach((result) => {
+            if (Array.isArray(result)) {
+                updatedResults.push(...result);
+            }
+            else {
+                updatedResults.push(result);
+            }
+        });
+        return updatedResults.reduce((current, result) => {
             let time = {};
             if (result.loading !== undefined && result.running !== undefined) {
                 const loading = +result.loading;
