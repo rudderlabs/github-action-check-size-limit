@@ -112,16 +112,16 @@ class SizeLimit {
     // ]
     // To
     // [{ name: 'a', size: 1 }, { name: 'b', size: 2 }, { name: 'c', size: 1 }, { name: 'd', size: 2 }]
-    let updatedResults: any[] = [];
+    let flattenedResults: any[] = [];
     results.forEach((result: { [name: string]: IResult }) => {
       if (Array.isArray(result)) {
-        updatedResults.push(...result);
+        flattenedResults.push(...result);
       } else {
-        updatedResults.push(result);
+        flattenedResults.push(result);
       }
     });
 
-    return updatedResults.reduce(
+    return flattenedResults.reduce(
       (current: { [name: string]: IResult }, result: any) => {
         let time = {};
 
