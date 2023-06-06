@@ -42,6 +42,47 @@ describe("SizeLimit", () => {
     });
   });
 
+  test("should parse size-limit of monorepo output", () => {
+    const limit = new SizeLimit();
+    const output = JSON.stringify([
+      [
+        {
+          name: "dist/index.js",
+          passed: true,
+          size: "110894"
+        },
+        {
+          name: "dist/new.js",
+          passed: true,
+          size: "100894"
+        }
+      ],
+      [
+        {
+          name: "dist/old.js",
+          passed: true,
+          size: "100894"
+        }
+      ],
+      []
+    ]);
+
+    expect(limit.parseResults(output)).toEqual({
+      "dist/index.js": {
+        name: "dist/index.js",
+        size: 110894
+      },
+      "dist/new.js": {
+        name: "dist/new.js",
+        size: 100894
+      },
+      "dist/old.js": {
+        name: "dist/old.js",
+        size: 100894
+      }
+    });
+  });
+
   test("should format size-limit results", () => {
     const limit = new SizeLimit();
     const base = {
