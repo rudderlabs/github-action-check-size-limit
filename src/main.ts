@@ -39,7 +39,7 @@ async function run() {
       );
     }
 
-    const isMonorepo = Boolean(getInput("is_monorepo"));
+    const isMonorepo = getInput("is_monorepo") === "true";
     const token = getInput("github_token");
     const skipStep = getInput("skip_step");
     const buildScript = getInput("build_script");
