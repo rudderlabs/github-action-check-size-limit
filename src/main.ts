@@ -39,6 +39,7 @@ async function run() {
       );
     }
 
+    const isMonorepo = Boolean(getInput("is_monorepo"));
     const token = getInput("github_token");
     const skipStep = getInput("skip_step");
     const buildScript = getInput("build_script");
@@ -60,7 +61,8 @@ async function run() {
       windowsVerbatimArguments,
       directory,
       script,
-      packageManager
+      packageManager,
+      isMonorepo
     );
     const { output: baseOutput } = await term.execSizeLimit(
       pr.base.ref,
@@ -70,7 +72,8 @@ async function run() {
       windowsVerbatimArguments,
       directory,
       script,
-      packageManager
+      packageManager,
+      isMonorepo
     );
 
     let base;

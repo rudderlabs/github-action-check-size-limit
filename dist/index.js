@@ -31674,7 +31674,7 @@ class Term {
     getPackageManager(directory) {
         return (0, has_yarn_1.default)(directory) ? "yarn" : (0, has_pnpm_1.default)(directory) ? "pnpm" : "npm";
     }
-    execSizeLimit(branch, skipStep, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager) {
+    execSizeLimit(branch, skipStep, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo) {
         return __awaiter(this, void 0, void 0, function* () {
             const manager = packageManager || this.getPackageManager(directory);
             let output = "";
@@ -31689,7 +31689,7 @@ class Term {
             }
             if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
                 yield (0, exec_1.exec)(`${manager} install`, [], {
-                    cwd: directory
+                    cwd: isMonorepo ? directory : process.cwd()
                 });
             }
             if (skipStep !== BUILD_STEP) {
@@ -31768,6 +31768,7 @@ function run() {
             if (!pr) {
                 throw new Error("No PR found. Only pull_request workflows are supported.");
             }
+            const isMonorepo = Boolean((0, core_1.getInput)("is_monorepo"));
             const token = (0, core_1.getInput)("github_token");
             const skipStep = (0, core_1.getInput)("skip_step");
             const buildScript = (0, core_1.getInput)("build_script");
@@ -31779,8 +31780,8 @@ function run() {
             const octokit = new github_1.GitHub(token);
             const term = new Term_1.default();
             const limit = new SizeLimit_1.default();
-            const { status, output } = yield term.execSizeLimit(null, skipStep, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager);
-            const { output: baseOutput } = yield term.execSizeLimit(pr.base.ref, null, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager);
+            const { status, output } = yield term.execSizeLimit(null, skipStep, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo);
+            const { output: baseOutput } = yield term.execSizeLimit(pr.base.ref, null, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo);
             let base;
             let current;
             try {

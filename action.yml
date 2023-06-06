@@ -5,6 +5,10 @@ branding:
   icon: 'activity'
   color: 'green'
 inputs:
+  is_monorepo:
+    required: false
+    description: 'denote if action is used in a Monorepo and thus install script should execute always on root instead of provided package/custom subdirectory'
+    default: false
   github_token:
     required: true
     description: 'a github access token'

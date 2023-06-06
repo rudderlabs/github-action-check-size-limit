@@ -25,7 +25,8 @@ class Term {
     windowsVerbatimArguments?: boolean,
     directory?: string,
     script?: string,
-    packageManager?: string
+    packageManager?: string,
+    isMonorepo?: boolean
   ): Promise<{ status: number; output: string }> {
     const manager = packageManager || this.getPackageManager(directory);
     let output = "";
@@ -42,7 +43,7 @@ class Term {
 
     if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
       await exec(`${manager} install`, [], {
-        cwd: directory
+        cwd: isMonorepo ? directory : process.cwd()
       });
     }
 
