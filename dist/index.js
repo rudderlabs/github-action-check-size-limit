@@ -31604,16 +31604,16 @@ class SizeLimit {
         // ]
         // To
         // [{ name: 'a', size: 1 }, { name: 'b', size: 2 }, { name: 'c', size: 1 }, { name: 'd', size: 2 }]
-        let updatedResults = [];
+        let flattenedResults = [];
         results.forEach((result) => {
             if (Array.isArray(result)) {
-                updatedResults.push(...result);
+                flattenedResults.push(...result);
             }
             else {
-                updatedResults.push(result);
+                flattenedResults.push(result);
             }
         });
-        return updatedResults.reduce((current, result) => {
+        return flattenedResults.reduce((current, result) => {
             let time = {};
             if (result.loading !== undefined && result.running !== undefined) {
                 const loading = +result.loading;
@@ -31791,7 +31791,7 @@ function run() {
             if (!pr) {
                 throw new Error("No PR found. Only pull_request workflows are supported.");
             }
-            const isMonorepo = Boolean((0, core_1.getInput)("is_monorepo"));
+            const isMonorepo = (0, core_1.getInput)("is_monorepo") === "true";
             const token = (0, core_1.getInput)("github_token");
             const skipStep = (0, core_1.getInput)("skip_step");
             const buildScript = (0, core_1.getInput)("build_script");
@@ -31809,10 +31809,12 @@ function run() {
             let current;
             try {
                 base = limit.parseResults(baseOutput);
+                console.log('base', base);
                 current = limit.parseResults(output);
+                console.log('current', current);
             }
             catch (error) {
-                console.log("Error parsing size-limit output. The output should be a json.");
+                console.log("Error parsing size-limit output. The output should be a json.", baseOutput, output);
                 throw error;
             }
             const body = [
