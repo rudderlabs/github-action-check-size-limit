@@ -33,27 +33,34 @@ class Term {
 
     if (branch) {
       try {
+        console.log("Fetching", branch);
         await exec(`git fetch origin ${branch} --depth=1`);
       } catch (error) {
         console.log("Fetch failed", error.message);
       }
 
+      console.log("checkout", branch);
       await exec(`git checkout -f ${branch}`);
     }
 
     if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
+
+      console.log("install", !isMonorepo ? directory : process.cwd());
       await exec(`${manager} install`, [], {
-        cwd: isMonorepo ? directory : process.cwd()
+        cwd: !isMonorepo ? directory : process.cwd()
       });
     }
 
     if (skipStep !== BUILD_STEP) {
       const script = buildScript || "build";
+
+      console.log("build", script, directory);
       await exec(`${manager} run ${script}`, [], {
         cwd: directory
       });
     }
 
+    console.log("check", script, directory);
     const status = await exec(script, [], {
       windowsVerbatimArguments,
       ignoreReturnCode: true,
@@ -66,6 +73,7 @@ class Term {
     });
 
     if (cleanScript) {
+      console.log("clean", cleanScript, directory);
       await exec(`${manager} run ${cleanScript}`, [], {
         cwd: directory
       });

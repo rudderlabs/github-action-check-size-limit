@@ -31680,24 +31680,29 @@ class Term {
             let output = "";
             if (branch) {
                 try {
+                    console.log("Fetching", branch);
                     yield (0, exec_1.exec)(`git fetch origin ${branch} --depth=1`);
                 }
                 catch (error) {
                     console.log("Fetch failed", error.message);
                 }
+                console.log("checkout", branch);
                 yield (0, exec_1.exec)(`git checkout -f ${branch}`);
             }
             if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
+                console.log("install", !isMonorepo ? directory : process.cwd());
                 yield (0, exec_1.exec)(`${manager} install`, [], {
-                    cwd: isMonorepo ? directory : process.cwd()
+                    cwd: !isMonorepo ? directory : process.cwd()
                 });
             }
             if (skipStep !== BUILD_STEP) {
                 const script = buildScript || "build";
+                console.log("build", script, directory);
                 yield (0, exec_1.exec)(`${manager} run ${script}`, [], {
                     cwd: directory
                 });
             }
+            console.log("check", script, directory);
             const status = yield (0, exec_1.exec)(script, [], {
                 windowsVerbatimArguments,
                 ignoreReturnCode: true,
@@ -31709,6 +31714,7 @@ class Term {
                 cwd: directory
             });
             if (cleanScript) {
+                console.log("clean", cleanScript, directory);
                 yield (0, exec_1.exec)(`${manager} run ${cleanScript}`, [], {
                     cwd: directory
                 });
