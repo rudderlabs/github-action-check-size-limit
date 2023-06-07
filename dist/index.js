@@ -31682,7 +31682,7 @@ const INSTALL_STEP = "install";
 const BUILD_STEP = "build";
 class Term {
     /**
-     * Autodetects and gets the current package manager for the current directory, either yarn, pnpm,
+     * Auto detects and gets the current package manager for the current directory, either yarn, pnpm,
      * or npm. Default is `npm`.
      *
      * @param directory The current directory
@@ -31694,7 +31694,7 @@ class Term {
     execSizeLimit(branch, skipStep, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo) {
         return __awaiter(this, void 0, void 0, function* () {
             const manager = packageManager || this.getPackageManager(directory);
-            let output = "";
+            let output = isMonorepo ? "[" : "";
             if (branch) {
                 try {
                     console.log("Fetching", branch);
@@ -31735,6 +31735,9 @@ class Term {
                 yield (0, exec_1.exec)(`${manager} run ${cleanScript}`, [], {
                     cwd: directory
                 });
+            }
+            if (isMonorepo) {
+                output += "[]\n]";
             }
             return {
                 status,
