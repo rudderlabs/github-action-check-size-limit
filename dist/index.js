@@ -31726,6 +31726,9 @@ class Term {
                 listeners: {
                     stdout: (data) => {
                         output += data.toString();
+                        if (isMonorepo) {
+                            output += ", ";
+                        }
                     }
                 },
                 cwd: directory
