@@ -67,6 +67,9 @@ class Term {
       listeners: {
         stdout: (data: Buffer) => {
           output += data.toString();
+          if (isMonorepo) {
+            output += ", ";
+          }
         }
       },
       cwd: directory
