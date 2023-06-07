@@ -7,7 +7,7 @@ const BUILD_STEP = "build";
 
 class Term {
   /**
-   * Autodetects and gets the current package manager for the current directory, either yarn, pnpm,
+   * Auto detects and gets the current package manager for the current directory, either yarn, pnpm,
    * or npm. Default is `npm`.
    *
    * @param directory The current directory
@@ -29,7 +29,7 @@ class Term {
     isMonorepo?: boolean
   ): Promise<{ status: number; output: string }> {
     const manager = packageManager || this.getPackageManager(directory);
-    let output = "";
+    let output = isMonorepo ? "[" : "";
 
     if (branch) {
       try {
@@ -77,6 +77,10 @@ class Term {
       await exec(`${manager} run ${cleanScript}`, [], {
         cwd: directory
       });
+    }
+
+    if (isMonorepo) {
+      output += "[]\n]";
     }
 
     return {
