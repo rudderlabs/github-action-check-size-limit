@@ -31577,12 +31577,14 @@ class SizeLimit {
         return `${formatted}% 🔽`;
     }
     formatLine(value, change) {
-        return `${value} (${change})`;
+        return change ? `${value} (${change})` : `${value}`;
     }
     formatSizeResult(name, base, current) {
         return [
             name,
-            this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size))
+            this.formatLine(this.formatBytes(base.size)),
+            this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size)),
+            this.formatLine(this.formatBytes(current.sizeLimit))
         ];
     }
     formatTimeResult(name, base, current) {
@@ -31624,7 +31626,7 @@ class SizeLimit {
                     total: loading + running
                 };
             }
-            return Object.assign(Object.assign({}, current), { [result.name]: Object.assign({ name: result.name, size: +result.size }, time) });
+            return Object.assign(Object.assign({}, current), { [result.name]: Object.assign({ name: result.name, size: +result.size, sizeLimit: +result.sizeLimit }, time) });
         }, {});
     }
     formatResults(base, current) {
@@ -31644,9 +31646,9 @@ class SizeLimit {
         return [header, ...fields];
     }
 }
-SizeLimit.SIZE_RESULTS_HEADER = ["Path", "Size"];
+SizeLimit.SIZE_RESULTS_HEADER = ["Name", "Size (Base)", "Size (Current)", "Size Limit"];
 SizeLimit.TIME_RESULTS_HEADER = [
-    "Path",
+    "Name",
     "Size",
     "Loading time (3g)",
     "Running time (snapdragon)",
