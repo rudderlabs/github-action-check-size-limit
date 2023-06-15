@@ -4,6 +4,7 @@ import bytes from "bytes";
 interface IResult {
   name: string;
   size: number;
+  sizeLimit?: number;
   running?: number;
   loading?: number;
   total?: number;
@@ -18,10 +19,10 @@ const EmptyResult = {
 };
 
 class SizeLimit {
-  static SIZE_RESULTS_HEADER = ["Path", "Size"];
+  static SIZE_RESULTS_HEADER = ["Name", "Size (Base)", "Size (Current)", "Size Limit"];
 
   static TIME_RESULTS_HEADER = [
-    "Path",
+    "Name",
     "Size",
     "Loading time (3g)",
     "Running time (snapdragon)",
@@ -60,8 +61,8 @@ class SizeLimit {
     return `${formatted}% 🔽`;
   }
 
-  private formatLine(value: string, change: string) {
-    return `${value} (${change})`;
+  private formatLine(value: string, change?: string) {
+    return change ? `${value} (${change})` : `${value}`;
   }
 
   private formatSizeResult(
@@ -72,8 +73,14 @@ class SizeLimit {
     return [
       name,
       this.formatLine(
+        this.formatBytes(base.size),
+      ),
+      this.formatLine(
         this.formatBytes(current.size),
         this.formatChange(base.size, current.size)
+      ),
+      this.formatLine(
+        this.formatBytes(current.sizeLimit),
       )
     ];
   }
@@ -141,6 +148,7 @@ class SizeLimit {
           [result.name]: {
             name: result.name,
             size: +result.size,
+            sizeLimit: +result.sizeLimit,
             ...time
           }
         };

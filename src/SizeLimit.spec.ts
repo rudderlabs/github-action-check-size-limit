@@ -19,6 +19,7 @@ describe("SizeLimit", () => {
         loading: 2.1658984375,
         running: 0.10210999999999999,
         size: 110894,
+        sizeLimit: NaN,
         total: 2.2680084375000003
       }
     });
@@ -30,14 +31,16 @@ describe("SizeLimit", () => {
       {
         name: "dist/index.js",
         passed: true,
-        size: "110894"
+        size: "110894",
+        sizeLimit: "120000",
       }
     ]);
 
     expect(limit.parseResults(output)).toEqual({
       "dist/index.js": {
         name: "dist/index.js",
-        size: 110894
+        size: 110894,
+        sizeLimit: 120000,
       }
     });
   });
@@ -70,15 +73,18 @@ describe("SizeLimit", () => {
     expect(limit.parseResults(output)).toEqual({
       "dist/index.js": {
         name: "dist/index.js",
-        size: 110894
+        size: 110894,
+        sizeLimit: NaN,
       },
       "dist/new.js": {
         name: "dist/new.js",
-        size: 100894
+        size: 100894,
+        sizeLimit: NaN,
       },
       "dist/old.js": {
         name: "dist/old.js",
-        size: 100894
+        size: 100894,
+        sizeLimit: NaN,
       }
     });
   });
@@ -98,6 +104,7 @@ describe("SizeLimit", () => {
       "dist/index.js": {
         name: "dist/index.js",
         size: 100894,
+        sizeLimit: 110000,
         running: 0.20210999999999999,
         loading: 2.5658984375,
         total: 2.7680084375000003
@@ -127,13 +134,14 @@ describe("SizeLimit", () => {
     const current = {
       "dist/index.js": {
         name: "dist/index.js",
-        size: 100894
+        size: 100894,
+        sizeLimit: 110000
       }
     };
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ["dist/index.js", "98.53 KB (-9.02% 🔽)"]
+      ["dist/index.js", "108.29 KB", "98.53 KB (-9.02% 🔽)", "107.42 KB"]
     ]);
   });
 
@@ -158,8 +166,8 @@ describe("SizeLimit", () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ["dist/index.js", "98.53 KB (-9.02% 🔽)"],
-      ["dist/new.js", "98.53 KB (+100% 🔺)"]
+      ["dist/index.js", "108.29 KB", "98.53 KB (-9.02% 🔽)", "null"],
+      ["dist/new.js", "0 B", "98.53 KB (+100% 🔺)", "null"]
     ]);
   });
 
@@ -180,8 +188,8 @@ describe("SizeLimit", () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ["dist/index.js", "0 B (-100% 🔽)"],
-      ["dist/new.js", "98.53 KB (+100% 🔺)"]
+      ["dist/index.js", "108.29 KB", "0 B (-100% 🔽)", "null"],
+      ["dist/new.js", "0 B", "98.53 KB (+100% 🔺)", "null"]
     ]);
   });
 });
