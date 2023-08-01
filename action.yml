@@ -12,6 +12,9 @@ inputs:
   github_token:
     required: true
     description: 'a github access token'
+  install_script:
+    required: false
+    description: 'a custom npm script to install'
   build_script:
     required: false
     description: 'a custom npm script to build'

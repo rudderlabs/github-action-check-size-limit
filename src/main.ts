@@ -42,6 +42,7 @@ async function run() {
     const isMonorepo = getInput("is_monorepo") === "true";
     const token = getInput("github_token");
     const skipStep = getInput("skip_step");
+    const installScript = getInput("install_script");
     const buildScript = getInput("build_script");
     const cleanScript = getInput("clean_script");
     const script = getInput("script");
@@ -56,6 +57,7 @@ async function run() {
     const { status, output } = await term.execSizeLimit(
       null,
       skipStep,
+      installScript,
       buildScript,
       cleanScript,
       windowsVerbatimArguments,
@@ -67,6 +69,7 @@ async function run() {
     const { output: baseOutput } = await term.execSizeLimit(
       pr.base.ref,
       null,
+      installScript,
       buildScript,
       cleanScript,
       windowsVerbatimArguments,
@@ -81,9 +84,9 @@ async function run() {
 
     try {
       base = limit.parseResults(baseOutput);
-      console.log('base', base);
+      console.log("base", base);
       current = limit.parseResults(output);
-      console.log('current', current);
+      console.log("current", current);
     } catch (error) {
       console.log(
         "Error parsing size-limit output. The output should be a json.",

@@ -20,6 +20,7 @@ class Term {
   async execSizeLimit(
     branch?: string,
     skipStep?: string,
+    installScript?: string,
     buildScript?: string,
     cleanScript?: string,
     windowsVerbatimArguments?: boolean,
@@ -44,11 +45,16 @@ class Term {
     }
 
     if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
+      const script = installScript || "ci";
 
-      console.log("install", !isMonorepo ? directory : process.cwd());
-      await exec(`${manager} install`, [], {
-        cwd: !isMonorepo ? directory : process.cwd()
-      });
+      console.log("install", script, !isMonorepo ? directory : process.cwd());
+      await exec(
+        script === "ci" ? `${manager} ci` : `${manager} run ${script}`,
+        [],
+        {
+          cwd: !isMonorepo ? directory : process.cwd()
+        }
+      );
     }
 
     if (skipStep !== BUILD_STEP) {

@@ -19,7 +19,12 @@ const EmptyResult = {
 };
 
 class SizeLimit {
-  static SIZE_RESULTS_HEADER = ["Name", "Size (Base)", "Size (Current)", "Size Limit"];
+  static SIZE_RESULTS_HEADER = [
+    "Name",
+    "Size (Base)",
+    "Size (Current)",
+    "Size Limit"
+  ];
 
   static TIME_RESULTS_HEADER = [
     "Name",
@@ -72,16 +77,12 @@ class SizeLimit {
   ): Array<string> {
     return [
       name,
-      this.formatLine(
-        this.formatBytes(base.size),
-      ),
+      this.formatLine(this.formatBytes(base.size)),
       this.formatLine(
         this.formatBytes(current.size),
         this.formatChange(base.size, current.size)
       ),
-      this.formatLine(
-        this.formatBytes(current.sizeLimit),
-      )
+      this.formatLine(this.formatBytes(current.sizeLimit))
     ];
   }
 

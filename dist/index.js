@@ -31646,7 +31646,12 @@ class SizeLimit {
         return [header, ...fields];
     }
 }
-SizeLimit.SIZE_RESULTS_HEADER = ["Name", "Size (Base)", "Size (Current)", "Size Limit"];
+SizeLimit.SIZE_RESULTS_HEADER = [
+    "Name",
+    "Size (Base)",
+    "Size (Current)",
+    "Size Limit"
+];
 SizeLimit.TIME_RESULTS_HEADER = [
     "Name",
     "Size",
@@ -31693,7 +31698,7 @@ class Term {
     getPackageManager(directory) {
         return (0, has_yarn_1.default)(directory) ? "yarn" : (0, has_pnpm_1.default)(directory) ? "pnpm" : "npm";
     }
-    execSizeLimit(branch, skipStep, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo) {
+    execSizeLimit(branch, skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo) {
         return __awaiter(this, void 0, void 0, function* () {
             const manager = packageManager || this.getPackageManager(directory);
             let output = isMonorepo ? "[" : "";
@@ -31709,8 +31714,9 @@ class Term {
                 yield (0, exec_1.exec)(`git checkout -f ${branch}`);
             }
             if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
-                console.log("install", !isMonorepo ? directory : process.cwd());
-                yield (0, exec_1.exec)(`${manager} install`, [], {
+                const script = installScript || "ci";
+                console.log("install", script, !isMonorepo ? directory : process.cwd());
+                yield (0, exec_1.exec)(script === "ci" ? `${manager} ci` : `${manager} run ${script}`, [], {
                     cwd: !isMonorepo ? directory : process.cwd()
                 });
             }
@@ -31802,6 +31808,7 @@ function run() {
             const isMonorepo = (0, core_1.getInput)("is_monorepo") === "true";
             const token = (0, core_1.getInput)("github_token");
             const skipStep = (0, core_1.getInput)("skip_step");
+            const installScript = (0, core_1.getInput)("install_script");
             const buildScript = (0, core_1.getInput)("build_script");
             const cleanScript = (0, core_1.getInput)("clean_script");
             const script = (0, core_1.getInput)("script");
@@ -31811,15 +31818,15 @@ function run() {
             const octokit = new github_1.GitHub(token);
             const term = new Term_1.default();
             const limit = new SizeLimit_1.default();
-            const { status, output } = yield term.execSizeLimit(null, skipStep, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo);
-            const { output: baseOutput } = yield term.execSizeLimit(pr.base.ref, null, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo);
+            const { status, output } = yield term.execSizeLimit(null, skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo);
+            const { output: baseOutput } = yield term.execSizeLimit(pr.base.ref, null, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo);
             let base;
             let current;
             try {
                 base = limit.parseResults(baseOutput);
-                console.log('base', base);
+                console.log("base", base);
                 current = limit.parseResults(output);
-                console.log('current', current);
+                console.log("current", current);
             }
             catch (error) {
                 console.log("Error parsing size-limit output. The output should be a json.", baseOutput, output);

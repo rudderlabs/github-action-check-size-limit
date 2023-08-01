@@ -32,7 +32,7 @@ describe("SizeLimit", () => {
         name: "dist/index.js",
         passed: true,
         size: "110894",
-        sizeLimit: "120000",
+        sizeLimit: "120000"
       }
     ]);
 
@@ -40,7 +40,7 @@ describe("SizeLimit", () => {
       "dist/index.js": {
         name: "dist/index.js",
         size: 110894,
-        sizeLimit: 120000,
+        sizeLimit: 120000
       }
     });
   });
@@ -74,17 +74,17 @@ describe("SizeLimit", () => {
       "dist/index.js": {
         name: "dist/index.js",
         size: 110894,
-        sizeLimit: NaN,
+        sizeLimit: NaN
       },
       "dist/new.js": {
         name: "dist/new.js",
         size: 100894,
-        sizeLimit: NaN,
+        sizeLimit: NaN
       },
       "dist/old.js": {
         name: "dist/old.js",
         size: 100894,
-        sizeLimit: NaN,
+        sizeLimit: NaN
       }
     });
   });
