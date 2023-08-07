@@ -31564,17 +31564,17 @@ class SizeLimit {
     }
     formatChange(base = 0, current = 0) {
         if (base === 0) {
-            return "+100% 🔺";
+            return "+100% ▲";
         }
         const value = ((current - base) / base) * 100;
         const formatted = (Math.sign(value) * Math.ceil(Math.abs(value) * 100)) / 100;
         if (value > 0) {
-            return `+${formatted}% 🔺`;
+            return `+${formatted}% ▲`;
         }
         if (value === 0) {
             return `${formatted}%`;
         }
-        return `${formatted}% 🔽`;
+        return `${formatted}% ▼`;
     }
     formatLine(value, change) {
         return change ? `${value} (${change})` : `${value}`;
@@ -31584,7 +31584,8 @@ class SizeLimit {
             name,
             this.formatLine(this.formatBytes(base.size)),
             this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size)),
-            this.formatLine(this.formatBytes(current.sizeLimit))
+            this.formatLine(this.formatBytes(current.sizeLimit)),
+            this.formatLine(current.size > current.sizeLimit ? "❌" : "✅")
         ];
     }
     formatTimeResult(name, base, current) {
@@ -31650,7 +31651,8 @@ SizeLimit.SIZE_RESULTS_HEADER = [
     "Name",
     "Size (Base)",
     "Size (Current)",
-    "Size Limit"
+    "Size Limit",
+    "Status"
 ];
 SizeLimit.TIME_RESULTS_HEADER = [
     "Name",
