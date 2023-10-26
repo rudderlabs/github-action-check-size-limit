@@ -1,5 +1,5 @@
 // @ts-ignore
-import bytes from "bytes";
+import bytes from 'bytes';
 
 interface IResult {
   name: string;
@@ -11,32 +11,26 @@ interface IResult {
 }
 
 const EmptyResult = {
-  name: "-",
+  name: '-',
   size: 0,
   running: 0,
   loading: 0,
-  total: 0
+  total: 0,
 };
 
 class SizeLimit {
-  static SIZE_RESULTS_HEADER = [
-    "Name",
-    "Size (Base)",
-    "Size (Current)",
-    "Size Limit",
-    "Status"
-  ];
+  static SIZE_RESULTS_HEADER = ['Name', 'Size (Base)', 'Size (Current)', 'Size Limit', 'Status'];
 
   static TIME_RESULTS_HEADER = [
-    "Name",
-    "Size",
-    "Loading time (3g)",
-    "Running time (snapdragon)",
-    "Total time"
+    'Name',
+    'Size',
+    'Loading time (3g)',
+    'Running time (snapdragon)',
+    'Total time',
   ];
 
   private formatBytes(size: number): string {
-    return bytes.format(size, { unitSeparator: " " });
+    return bytes.format(size, { unitSeparator: ' ' });
   }
 
   private formatTime(seconds: number): string {
@@ -49,12 +43,11 @@ class SizeLimit {
 
   private formatChange(base: number = 0, current: number = 0): string {
     if (base === 0) {
-      return "+100% ▲";
+      return '+100% ▲';
     }
 
     const value = ((current - base) / base) * 100;
-    const formatted =
-      (Math.sign(value) * Math.ceil(Math.abs(value) * 100)) / 100;
+    const formatted = (Math.sign(value) * Math.ceil(Math.abs(value) * 100)) / 100;
 
     if (value > 0) {
       return `+${formatted}% ▲`;
@@ -71,43 +64,29 @@ class SizeLimit {
     return change ? `${value} (${change})` : `${value}`;
   }
 
-  private formatSizeResult(
-    name: string,
-    base: IResult,
-    current: IResult
-  ): Array<string> {
+  private formatSizeResult(name: string, base: IResult, current: IResult): Array<string> {
     return [
       name,
       this.formatLine(this.formatBytes(base.size)),
-      this.formatLine(
-        this.formatBytes(current.size),
-        this.formatChange(base.size, current.size)
-      ),
+      this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size)),
       this.formatLine(this.formatBytes(current.sizeLimit)),
-      this.formatLine(current.size > current.sizeLimit ? "❌" : "✅")
+      this.formatLine(current.size > current.sizeLimit ? '❌' : '✅'),
     ];
   }
 
-  private formatTimeResult(
-    name: string,
-    base: IResult,
-    current: IResult
-  ): Array<string> {
+  private formatTimeResult(name: string, base: IResult, current: IResult): Array<string> {
     return [
       name,
-      this.formatLine(
-        this.formatBytes(current.size),
-        this.formatChange(base.size, current.size)
-      ),
+      this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size)),
       this.formatLine(
         this.formatTime(current.loading),
-        this.formatChange(base.loading, current.loading)
+        this.formatChange(base.loading, current.loading),
       ),
       this.formatLine(
         this.formatTime(current.running),
-        this.formatChange(base.running, current.running)
+        this.formatChange(base.running, current.running),
       ),
-      this.formatTime(current.total)
+      this.formatTime(current.total),
     ];
   }
 
@@ -122,7 +101,7 @@ class SizeLimit {
     // ]
     // To
     // [{ name: 'a', size: 1 }, { name: 'b', size: 2 }, { name: 'c', size: 1 }, { name: 'd', size: 2 }]
-    let flattenedResults: any[] = [];
+    const flattenedResults: any[] = [];
     results.forEach((result: { [name: string]: IResult }) => {
       if (Array.isArray(result)) {
         flattenedResults.push(...result);
@@ -131,46 +110,39 @@ class SizeLimit {
       }
     });
 
-    return flattenedResults.reduce(
-      (current: { [name: string]: IResult }, result: any) => {
-        let time = {};
+    return flattenedResults.reduce((current: { [name: string]: IResult }, result: any) => {
+      let time = {};
 
-        if (result.loading !== undefined && result.running !== undefined) {
-          const loading = +result.loading;
-          const running = +result.running;
+      if (result.loading !== undefined && result.running !== undefined) {
+        const loading = +result.loading;
+        const running = +result.running;
 
-          time = {
-            running,
-            loading,
-            total: loading + running
-          };
-        }
-
-        return {
-          ...current,
-          [result.name]: {
-            name: result.name,
-            size: +result.size,
-            sizeLimit: +result.sizeLimit,
-            ...time
-          }
+        time = {
+          running,
+          loading,
+          total: loading + running,
         };
-      },
-      {}
-    );
+      }
+
+      return {
+        ...current,
+        [result.name]: {
+          name: result.name,
+          size: +result.size,
+          sizeLimit: +result.sizeLimit,
+          ...time,
+        },
+      };
+    }, {});
   }
 
   formatResults(
     base: { [name: string]: IResult },
-    current: { [name: string]: IResult }
+    current: { [name: string]: IResult },
   ): Array<Array<string>> {
     const names = [...new Set([...Object.keys(base), ...Object.keys(current)])];
-    const isSize = names.some(
-      (name: string) => current[name] && current[name].total === undefined
-    );
-    const header = isSize
-      ? SizeLimit.SIZE_RESULTS_HEADER
-      : SizeLimit.TIME_RESULTS_HEADER;
+    const isSize = names.some((name: string) => current[name] && current[name].total === undefined);
+    const header = isSize ? SizeLimit.SIZE_RESULTS_HEADER : SizeLimit.TIME_RESULTS_HEADER;
     const fields = names.map((name: string) => {
       const baseResult = base[name] || EmptyResult;
       const currentResult = current[name] || EmptyResult;
