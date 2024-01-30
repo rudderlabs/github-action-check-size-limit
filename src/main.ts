@@ -92,7 +92,9 @@ async function run() {
       throw error;
     }
 
-    const body = [SIZE_LIMIT_HEADING, markdownTable(limit.formatResults(base, current))].join('\r\n');
+    const body = [SIZE_LIMIT_HEADING, markdownTable(limit.formatResults(base, current))].join(
+      '\r\n',
+    );
 
     const sizeLimitComment = await fetchPreviousComment(octokit, repo, pr);
 
