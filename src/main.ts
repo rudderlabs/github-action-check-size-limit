@@ -62,6 +62,7 @@ async function run() {
       packageManager,
       isMonorepo,
     );
+
     const { output: baseOutput } = await term.execSizeLimit(
       pr.base.ref,
       null,
@@ -73,6 +74,7 @@ async function run() {
       script,
       packageManager,
       isMonorepo,
+      pr.head.ref
     );
 
     let base;
