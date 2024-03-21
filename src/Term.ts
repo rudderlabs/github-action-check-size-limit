@@ -41,6 +41,7 @@ class Term {
     script?: string,
     packageManager?: string,
     isMonorepo?: boolean,
+    prevBranch?: string
   ): Promise<{ status: number; output: string }> {
     const manager = packageManager || this.getPackageManager(directory);
     let output = isMonorepo ? '[' : '';
@@ -99,6 +100,11 @@ class Term {
 
     if (isMonorepo) {
       output += '[]\n]';
+    }
+
+    if (branch && prevBranch) {
+      console.log('Restoring the previous branch', prevBranch);
+      await exec(`git checkout -f ${prevBranch}`);
     }
 
     return {
