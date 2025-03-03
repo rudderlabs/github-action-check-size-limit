@@ -6,12 +6,15 @@
   "main": "dist/index.js",
   "license": "ISC",
   "scripts": {
+    "setup": "npm install",
+    "setup:ci": "npm ci",
     "format": "prettier --write **/*.ts",
     "lint": "eslint src/**/*.ts",
     "test": "jest",
     "build": "ncc build src/main.ts -o dist",
     "size-build": "npm run build",
-    "size": "npm run size-build && size-limit"
+    "size": "npm run size-build && size-limit",
+    "clean": "git clean -xdf node_modules && rm -rf dist"
   },
   "size-limit": [
     {

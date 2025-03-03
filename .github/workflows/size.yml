@@ -29,3 +29,6 @@ jobs:
         uses: ./
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          install_script: "setup:ci"
+          clean_script: "clean"
+          build_script: "build"
