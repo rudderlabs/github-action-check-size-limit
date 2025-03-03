@@ -16,13 +16,13 @@ async function fetchPreviousComment(
     'GET /repos/:owner/:repo/issues/:issue_number/comments',
     {
       ...repo,
-      // eslint-disable-next-line camelcase
+
       issue_number: pr.number,
     },
   );
 
-  const sizeLimitComment = commentList.find(comment =>
-    (comment as any).body.startsWith(SIZE_LIMIT_HEADING),
+  const sizeLimitComment = commentList.find((comment: { body: string }) =>
+    comment.body.startsWith(SIZE_LIMIT_HEADING),
   );
   return !sizeLimitComment ? null : sizeLimitComment;
 }
@@ -74,7 +74,7 @@ async function run() {
       script,
       packageManager,
       isMonorepo,
-      pr.head.ref
+      pr.head.ref,
     );
 
     let base;
@@ -104,11 +104,11 @@ async function run() {
       try {
         await octokit.rest.issues.createComment({
           ...repo,
-          // eslint-disable-next-line camelcase
+
           issue_number: pr.number,
           body,
         });
-      } catch (error) {
+      } catch {
         console.log(
           "Error creating comment. This can happen for PR's originating from a fork without write permissions.",
         );
@@ -117,11 +117,11 @@ async function run() {
       try {
         await octokit.rest.issues.updateComment({
           ...repo,
-          // eslint-disable-next-line camelcase
+
           comment_id: (sizeLimitComment as any).id,
           body,
         });
-      } catch (error) {
+      } catch {
         console.log(
           "Error updating comment. This can happen for PR's originating from a fork without write permissions.",
         );

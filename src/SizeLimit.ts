@@ -1,4 +1,3 @@
-// @ts-ignore
 import bytes from 'bytes';
 
 interface IResult {
@@ -43,21 +42,21 @@ class SizeLimit {
 
   private formatChange(base: number = 0, current: number = 0): string {
     if (base === 0) {
-      return '+100% ▲';
+      return `+100% 🔺`;
     }
 
     const value = ((current - base) / base) * 100;
     const formatted = (Math.sign(value) * Math.ceil(Math.abs(value) * 100)) / 100;
 
     if (value > 0) {
-      return `+${formatted}% ▲`;
+      return `+${formatted}% 🔺`;
     }
 
     if (value === 0) {
       return `${formatted}%`;
     }
 
-    return `${formatted}% ▼`;
+    return `${formatted}% 🟢`;
   }
 
   private formatLine(value: string, change?: string) {
@@ -102,13 +101,13 @@ class SizeLimit {
     // To
     // [{ name: 'a', size: 1 }, { name: 'b', size: 2 }, { name: 'c', size: 1 }, { name: 'd', size: 2 }]
     const flattenedResults: any[] = [];
-    results.forEach((result: { [name: string]: IResult }) => {
+    for (const result of results) {
       if (Array.isArray(result)) {
         flattenedResults.push(...result);
       } else {
         flattenedResults.push(result);
       }
-    });
+    }
 
     return flattenedResults.reduce((current: { [name: string]: IResult }, result: any) => {
       let time = {};
