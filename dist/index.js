@@ -30122,7 +30122,7 @@ class Term {
     execSizeLimit(branch, skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo, prevBranch) {
         return __awaiter(this, void 0, void 0, function* () {
             const manager = packageManager || this.getPackageManager(directory);
-            let output = isMonorepo ? '[' : '';
+            let output = '';
             if (branch) {
                 try {
                     console.log('Fetching', branch);
@@ -30155,9 +30155,6 @@ class Term {
                 listeners: {
                     stdout: (data) => {
                         output += data.toString();
-                        if (isMonorepo) {
-                            output += ', ';
-                        }
                     },
                 },
                 cwd: directory,
@@ -30169,7 +30166,7 @@ class Term {
                 });
             }
             if (isMonorepo) {
-                output += '[]\n]';
+                output = JSON.stringify(output.trim().split(/\n(?=\[)/).map((line) => JSON.parse(line)));
             }
             if (branch && prevBranch) {
                 console.log('Restoring the previous branch', prevBranch);
