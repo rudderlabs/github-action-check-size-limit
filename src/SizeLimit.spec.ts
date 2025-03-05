@@ -1,3 +1,4 @@
+import '@jest/globals';
 import SizeLimit from './SizeLimit';
 
 describe('SizeLimit', () => {
@@ -105,7 +106,7 @@ describe('SizeLimit', () => {
         name: 'dist/index.js',
         size: 100894,
         sizeLimit: 110000,
-        running: 0.20210999999999999,
+        running: 0.20211,
         loading: 2.5658984375,
         total: 2.7680084375000003,
       },
@@ -113,7 +114,13 @@ describe('SizeLimit', () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.TIME_RESULTS_HEADER,
-      ['dist/index.js', '98.53 KB (-9.02% ▼)', '2.6 s (+18.47% ▲)', '203 ms (+97.94% ▲)', '2.8 s'],
+      [
+        'dist/index.js',
+        '98.53 KB (-9.02% 🟢)',
+        '2.6 s (+18.47% 🔺)',
+        '203 ms (+97.94% 🔺)',
+        '2.8 s',
+      ],
     ]);
   });
 
@@ -135,7 +142,7 @@ describe('SizeLimit', () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ['dist/index.js', '108.29 KB', '98.53 KB (-9.02% ▼)', '107.42 KB', '✅'],
+      ['dist/index.js', '108.29 KB', '98.53 KB (-9.02% 🟢)', '107.42 KB', '✅'],
     ]);
   });
 
@@ -160,8 +167,8 @@ describe('SizeLimit', () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ['dist/index.js', '108.29 KB', '98.53 KB (-9.02% ▼)', 'null', '✅'],
-      ['dist/new.js', '0 B', '98.53 KB (+100% ▲)', 'null', '✅'],
+      ['dist/index.js', '108.29 KB', '98.53 KB (-9.02% 🟢)', 'null', '✅'],
+      ['dist/new.js', '0 B', '98.53 KB (+100% 🔺)', 'null', '✅'],
     ]);
   });
 
@@ -182,8 +189,8 @@ describe('SizeLimit', () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ['dist/index.js', '108.29 KB', '0 B (-100% ▼)', 'null', '✅'],
-      ['dist/new.js', '0 B', '98.53 KB (+100% ▲)', 'null', '✅'],
+      ['dist/index.js', '108.29 KB', '0 B (-100% 🟢)', 'null', '✅'],
+      ['dist/new.js', '0 B', '98.53 KB (+100% 🔺)', 'null', '✅'],
     ]);
   });
 
@@ -205,7 +212,7 @@ describe('SizeLimit', () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ['dist/index.js', '108.29 KB', '118.06 KB (+9.02% ▲)', '107.42 KB', '❌'],
+      ['dist/index.js', '108.29 KB', '118.06 KB (+9.02% 🔺)', '107.42 KB', '❌'],
     ]);
   });
 });

@@ -41,7 +41,7 @@ class Term {
     script?: string,
     packageManager?: string,
     isMonorepo?: boolean,
-    prevBranch?: string
+    prevBranch?: string,
   ): Promise<{ status: number; output: string }> {
     const manager = packageManager || this.getPackageManager(directory);
     let output = isMonorepo ? '[' : '';
