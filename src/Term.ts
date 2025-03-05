@@ -44,7 +44,7 @@ class Term {
     prevBranch?: string,
   ): Promise<{ status: number; output: string }> {
     const manager = packageManager || this.getPackageManager(directory);
-    let output = isMonorepo ? '[' : '';
+    let output = '';
 
     if (branch) {
       try {
@@ -83,9 +83,6 @@ class Term {
       listeners: {
         stdout: (data: Buffer) => {
           output += data.toString();
-          if (isMonorepo) {
-            output += ', ';
-          }
         },
       },
       cwd: directory,
@@ -99,7 +96,7 @@ class Term {
     }
 
     if (isMonorepo) {
-      output += '[]\n]';
+      output = JSON.stringify(output.trim().split(/\n(?=\[)/).map((line) => JSON.parse(line)));
     }
 
     if (branch && prevBranch) {
