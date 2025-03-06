@@ -142,7 +142,7 @@ describe('SizeLimit', () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ['dist/index.js', '108.29 KB', '98.53 KB (-9.02% 🟢)', '107.42 KB', '✅'],
+      ['dist/index.js', '98.53 KB', '-9.77 KB (-9.02% 🟢)', '107.42 KB (✅)'],
     ]);
   });
 
@@ -158,17 +158,19 @@ describe('SizeLimit', () => {
       'dist/index.js': {
         name: 'dist/index.js',
         size: 100894,
+        sizeLimit: 110000,
       },
       'dist/new.js': {
         name: 'dist/new.js',
         size: 100894,
+        sizeLimit: 110000,
       },
     };
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ['dist/index.js', '108.29 KB', '98.53 KB (-9.02% 🟢)', 'null', '✅'],
-      ['dist/new.js', '0 B', '98.53 KB (+100% 🔺)', 'null', '✅'],
+      ['dist/index.js', '98.53 KB', '-9.77 KB (-9.02% 🟢)', '107.42 KB (✅)'],
+      ['dist/new.js', '98.53 KB', '98.53 KB (+100% 🔺)', '107.42 KB (✅)'],
     ]);
   });
 
@@ -189,8 +191,8 @@ describe('SizeLimit', () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ['dist/index.js', '108.29 KB', '0 B (-100% 🟢)', 'null', '✅'],
-      ['dist/new.js', '0 B', '98.53 KB (+100% 🔺)', 'null', '✅'],
+      ['dist/index.js', '0 B', '-108.29 KB (-100% 🟢)', 'null (✅)'],
+      ['dist/new.js', '98.53 KB', '98.53 KB (+100% 🔺)', 'null (✅)'],
     ]);
   });
 
@@ -212,7 +214,7 @@ describe('SizeLimit', () => {
 
     expect(limit.formatResults(base, current)).toEqual([
       SizeLimit.SIZE_RESULTS_HEADER,
-      ['dist/index.js', '108.29 KB', '118.06 KB (+9.02% 🔺)', '107.42 KB', '❌'],
+      ['dist/index.js', '118.06 KB', '9.77 KB (+9.02% 🔺)', '107.42 KB (10.64 KB ❌)'],
     ]);
   });
 });

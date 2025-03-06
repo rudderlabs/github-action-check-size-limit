@@ -18,7 +18,7 @@ const EmptyResult = {
 };
 
 class SizeLimit {
-  static SIZE_RESULTS_HEADER = ['Name', 'Size (Base)', 'Size (Current)', 'Size Limit', 'Status'];
+  static SIZE_RESULTS_HEADER = ['Name', 'Size', 'Delta', 'Limit check'];
 
   static TIME_RESULTS_HEADER = [
     'Name',
@@ -59,6 +59,27 @@ class SizeLimit {
     return `${formatted}% 🟢`;
   }
 
+  private formatSizeChange(base: number = 0, current: number = 0): string {
+    if (base === 0) {
+      const valueInBytes = this.formatBytes(current);
+      return `${valueInBytes} (+100% 🔺)`;
+    }
+
+    const value = ((current - base) / base) * 100;
+    const valueInBytes = this.formatBytes(current - base);
+    const formatted = (Math.sign(value) * Math.ceil(Math.abs(value) * 100)) / 100;
+
+    if (value > 0) {
+      return `${valueInBytes} (+${formatted}% 🔺)`;
+    }
+
+    if (value === 0) {
+      return `${valueInBytes} (0% 🟢)`;
+    }
+
+    return `${valueInBytes} (${formatted}% 🟢)`;
+  }
+
   private formatLine(value: string, change?: string) {
     return change ? `${value} (${change})` : `${value}`;
   }
@@ -66,10 +87,9 @@ class SizeLimit {
   private formatSizeResult(name: string, base: IResult, current: IResult): Array<string> {
     return [
       name,
-      this.formatLine(this.formatBytes(base.size)),
-      this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size)),
-      this.formatLine(this.formatBytes(current.sizeLimit)),
-      this.formatLine(current.size > current.sizeLimit ? '❌' : '✅'),
+      this.formatBytes(current.size),
+      this.formatSizeChange(base.size, current.size),
+      `${this.formatBytes(current.sizeLimit)} (${current.size > current.sizeLimit ? `${this.formatBytes(current.size - current.sizeLimit)} ❌` : '✅'})`,
     ];
   }
 

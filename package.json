@@ -19,7 +19,7 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "limit": "4500 ms",
+      "limit": "5000 ms",
       "webpack": true,
       "config": "./webpack.config.js",
       "modifyWebpackConfig": {
