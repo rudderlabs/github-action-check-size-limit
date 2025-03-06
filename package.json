@@ -19,21 +19,7 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "name": "Time limit",
       "limit": "5000 ms",
-      "webpack": true,
-      "config": "./webpack.config.js",
-      "modifyWebpackConfig": {
-        "output": {
-          "path": "./.size-limit-temp",
-          "clean": true
-        }
-      }
-    },
-    {
-      "path": "dist/index.js",
-      "name": "Size limit",
-      "limit": "126 KiB",
       "webpack": true,
       "config": "./webpack.config.js",
       "modifyWebpackConfig": {
