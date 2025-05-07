@@ -31,7 +31,6 @@ class Term {
   }
 
   async execSizeLimit(
-    branch?: string,
     skipStep?: string,
     installScript?: string,
     buildScript?: string,
@@ -41,22 +40,9 @@ class Term {
     script?: string,
     packageManager?: string,
     isMonorepo?: boolean,
-    prevBranch?: string,
   ): Promise<{ status: number; output: string }> {
     const manager = packageManager || this.getPackageManager(directory);
     let output = '';
-
-    if (branch) {
-      try {
-        console.log('Fetching', branch);
-        await exec(`git fetch origin ${branch} --depth=1`);
-      } catch (error) {
-        console.log('Fetch failed', error.message);
-      }
-
-      console.log('checkout', branch);
-      await exec(`git checkout -f ${branch}`);
-    }
 
     if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
       const scriptToExec = installScript || 'ci';
@@ -96,12 +82,12 @@ class Term {
     }
 
     if (isMonorepo) {
-      output = JSON.stringify(output.trim().split(/\n(?=\[)/).map((line) => JSON.parse(line)));
-    }
-
-    if (branch && prevBranch) {
-      console.log('Restoring the previous branch', prevBranch);
-      await exec(`git checkout -f ${prevBranch}`);
+      output = JSON.stringify(
+        output
+          .trim()
+          .split(/\n(?=\[)/)
+          .map(line => JSON.parse(line)),
+      );
     }
 
     return {

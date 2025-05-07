@@ -2,6 +2,7 @@ import { getInput, setFailed } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { GitHub } from '@actions/github/lib/utils';
 import { markdownTable } from 'markdown-table';
+import { exec } from '@actions/exec';
 import Term from './Term';
 import SizeLimit from './SizeLimit';
 
@@ -51,7 +52,6 @@ async function run() {
     const limit = new SizeLimit();
 
     const { status, output } = await term.execSizeLimit(
-      null,
       skipStep,
       installScript,
       buildScript,
@@ -63,8 +63,17 @@ async function run() {
       isMonorepo,
     );
 
+    console.log('Fetching the PR base branch reference', pr.base.sha);
+    try {
+      await exec(`git fetch origin ${pr.base.sha} --depth=1`);
+    } catch (error) {
+      console.log('Fetch failed', error.message);
+    }
+
+    console.log('Checking out the PR base branch reference', pr.base.sha);
+    await exec(`git checkout -f ${pr.base.sha}`);
+
     const { output: baseOutput } = await term.execSizeLimit(
-      pr.base.ref,
       null,
       installScript,
       buildScript,
@@ -74,8 +83,10 @@ async function run() {
       script,
       packageManager,
       isMonorepo,
-      pr.head.ref,
     );
+
+    console.log('Restoring the PR head reference', pr.head.sha);
+    await exec(`git checkout -f ${pr.head.sha}`);
 
     let base;
     let current;
