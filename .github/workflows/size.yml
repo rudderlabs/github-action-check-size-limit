@@ -25,6 +25,6 @@ jobs:
           HUSKY: 0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          install_script: "setup:ci"
-          clean_script: "clean"
-          build_script: "build"
+          install_script: "npm run setup:ci"
+          clean_script: "npm run clean"
+          build_script: "npm run build"

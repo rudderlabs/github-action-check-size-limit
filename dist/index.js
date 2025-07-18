@@ -1882,6 +1882,7 @@ class Context {
         this.action = process.env.GITHUB_ACTION;
         this.actor = process.env.GITHUB_ACTOR;
         this.job = process.env.GITHUB_JOB;
+        this.runAttempt = parseInt(process.env.GITHUB_RUN_ATTEMPT, 10);
         this.runNumber = parseInt(process.env.GITHUB_RUN_NUMBER, 10);
         this.runId = parseInt(process.env.GITHUB_RUN_ID, 10);
         this.apiUrl = (_a = process.env.GITHUB_API_URL) !== null && _a !== void 0 ? _a : `https://api.github.com`;
@@ -3569,13 +3570,28 @@ var import_graphql = __nccwpck_require__(7);
 var import_auth_token = __nccwpck_require__(7864);
 
 // pkg/dist-src/version.js
-var VERSION = "5.2.1";
+var VERSION = "5.2.2";
 
 // pkg/dist-src/index.js
 var noop = () => {
 };
 var consoleWarn = console.warn.bind(console);
 var consoleError = console.error.bind(console);
+function createLogger(logger = {}) {
+  if (typeof logger.debug !== "function") {
+    logger.debug = noop;
+  }
+  if (typeof logger.info !== "function") {
+    logger.info = noop;
+  }
+  if (typeof logger.warn !== "function") {
+    logger.warn = consoleWarn;
+  }
+  if (typeof logger.error !== "function") {
+    logger.error = consoleError;
+  }
+  return logger;
+}
 var userAgentTrail = `octokit-core.js/${VERSION} ${(0, import_universal_user_agent.getUserAgent)()}`;
 var Octokit = class {
   static {
@@ -3649,15 +3665,7 @@ var Octokit = class {
     }
     this.request = import_request.request.defaults(requestDefaults);
     this.graphql = (0, import_graphql.withCustomRequest)(this.request).defaults(requestDefaults);
-    this.log = Object.assign(
-      {
-        debug: noop,
-        info: noop,
-        warn: consoleWarn,
-        error: consoleError
-      },
-      options.log
-    );
+    this.log = createLogger(options.log);
     this.hook = hook;
     if (!options.authStrategy) {
       if (!options.auth) {
@@ -7525,31 +7533,6 @@ class Deprecation extends Error {
 }
 
 exports.Deprecation = Deprecation;
-
-
-/***/ }),
-
-/***/ 1223:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-const fs_1 = __nccwpck_require__(9896);
-const path_1 = __nccwpck_require__(6928);
-const pnpmLockFiles = ['shrinkwrap.yaml', 'pnpm-lock.yaml'];
-/**
- * Check if a project is using pnpm.
- *
- * @param {string} [cwd=process.cwd()] Current working directory
- * @returns {boolean}
- */
-function hasPNPM(cwd = process.cwd()) {
-    return pnpmLockFiles.some(lockFile => {
-        const lockFilePath = path_1.resolve(cwd, lockFile);
-        return fs_1.existsSync(lockFilePath);
-    });
-}
-module.exports = hasPNPM;
 
 
 /***/ }),
@@ -30269,53 +30252,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const exec_1 = __nccwpck_require__(5236);
-const has_yarn_1 = __importDefault(__nccwpck_require__(9014));
-const has_pnpm_1 = __importDefault(__nccwpck_require__(1223));
-const node_process_1 = __importDefault(__nccwpck_require__(1708));
-const node_path_1 = __importDefault(__nccwpck_require__(6760));
-const node_fs_1 = __importDefault(__nccwpck_require__(3024));
-function hasBun(cwd = node_process_1.default.cwd()) {
-    return node_fs_1.default.existsSync(node_path_1.default.resolve(cwd, 'bun.lockb'));
-}
 const INSTALL_STEP = 'install';
 const BUILD_STEP = 'build';
 class Term {
-    /**
-     * Autodetects and gets the current package manager for the current directory, either yarn, pnpm, bun,
-     * or npm. Default is `npm`.
-     *
-     * @param directory The current directory
-     * @returns The detected package manager in use, one of `yarn`, `pnpm`, `npm`, `bun`
-     */
-    getPackageManager(directory) {
-        return (0, has_yarn_1.default)(directory)
-            ? 'yarn'
-            : (0, has_pnpm_1.default)(directory)
-                ? 'pnpm'
-                : hasBun(directory)
-                    ? 'bun'
-                    : 'npm';
-    }
-    execSizeLimit(skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo) {
+    execSizeLimit(skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, isMonorepo) {
         return __awaiter(this, void 0, void 0, function* () {
-            const manager = packageManager || this.getPackageManager(directory);
             let output = '';
             if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
                 const scriptToExec = installScript || 'ci';
-                console.log('install', scriptToExec, !isMonorepo ? directory : node_process_1.default.cwd());
-                yield (0, exec_1.exec)(scriptToExec === 'ci' ? `${manager} ci` : `${manager} run ${scriptToExec}`, [], {
-                    cwd: !isMonorepo ? directory : node_process_1.default.cwd(),
+                console.log('install', scriptToExec, directory);
+                yield (0, exec_1.exec)(scriptToExec, [], {
+                    cwd: directory,
                 });
             }
             if (skipStep !== BUILD_STEP) {
                 const scriptToExec = buildScript || 'build';
                 console.log('build', scriptToExec, directory);
-                yield (0, exec_1.exec)(`${manager} run ${scriptToExec}`, [], {
+                yield (0, exec_1.exec)(scriptToExec, [], {
                     cwd: directory,
                 });
             }
@@ -30332,7 +30287,7 @@ class Term {
             });
             if (cleanScript) {
                 console.log('clean', cleanScript, directory);
-                yield (0, exec_1.exec)(`${manager} run ${cleanScript}`, [], {
+                yield (0, exec_1.exec)(cleanScript, [], {
                     cwd: directory,
                 });
             }
@@ -30401,13 +30356,12 @@ function run() {
             const buildScript = (0, core_1.getInput)('build_script');
             const cleanScript = (0, core_1.getInput)('clean_script');
             const script = (0, core_1.getInput)('script');
-            const packageManager = (0, core_1.getInput)('package_manager');
             const directory = (0, core_1.getInput)('directory') || process.cwd();
             const windowsVerbatimArguments = (0, core_1.getInput)('windows_verbatim_arguments') === 'true';
             const octokit = (0, github_1.getOctokit)(token);
             const term = new Term_1.default();
             const limit = new SizeLimit_1.default();
-            const { status, output } = yield term.execSizeLimit(skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo);
+            const { status, output } = yield term.execSizeLimit(skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, isMonorepo);
             console.log('Fetching the PR base branch reference', pr.base.sha);
             try {
                 yield (0, exec_1.exec)(`git fetch origin ${pr.base.sha} --depth=1`);
@@ -30417,7 +30371,7 @@ function run() {
             }
             console.log('Checking out the PR base branch reference', pr.base.sha);
             yield (0, exec_1.exec)(`git checkout -f ${pr.base.sha}`);
-            const { output: baseOutput } = yield term.execSizeLimit(null, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, packageManager, isMonorepo);
+            const { output: baseOutput } = yield term.execSizeLimit(null, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, isMonorepo);
             console.log('Restoring the PR head reference', pr.head.sha);
             yield (0, exec_1.exec)(`git checkout -f ${pr.head.sha}`);
             let base;
@@ -30581,30 +30535,6 @@ module.exports = require("node:crypto");
 
 "use strict";
 module.exports = require("node:events");
-
-/***/ }),
-
-/***/ 3024:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("node:fs");
-
-/***/ }),
-
-/***/ 6760:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("node:path");
-
-/***/ }),
-
-/***/ 1708:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("node:process");
 
 /***/ }),
 
@@ -32357,28 +32287,6 @@ function parseParams (str) {
 }
 
 module.exports = parseParams
-
-
-/***/ }),
-
-/***/ 9014:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-"use strict";
-__nccwpck_require__.r(__webpack_exports__);
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ hasYarn)
-/* harmony export */ });
-/* harmony import */ var node_process__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1708);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(6760);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(3024);
-
-
-
-
-function hasYarn(cwd = node_process__WEBPACK_IMPORTED_MODULE_0__.cwd()) {
-	return node_fs__WEBPACK_IMPORTED_MODULE_2__.existsSync(node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(cwd, 'yarn.lock'));
-}
 
 
 /***/ }),
