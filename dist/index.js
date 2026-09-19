@@ -30207,8 +30207,13 @@ class SizeLimit {
                     total: loading + running,
                 };
             }
-            return Object.assign(Object.assign({}, current), { [result.name]: Object.assign({ name: result.name, size: +result.size, sizeLimit: +result.sizeLimit }, time) });
+            return Object.assign(Object.assign({}, current), { [result.name]: Object.assign({ name: result.name, size: +result.size, sizeLimit: +result.sizeLimit, passed: result.passed }, time) });
         }, {});
+    }
+    hasExceededLimits(results) {
+        // size-limit reports passed for every entry that has a limit, size or time based. The size
+        // comparison is the fallback for outputs that do not carry the flag.
+        return Object.keys(results).some((name) => results[name].passed === false || results[name].size > results[name].sizeLimit);
     }
     formatResults(base, current) {
         const names = [...new Set([...Object.keys(base), ...Object.keys(current)])];
@@ -30256,7 +30261,30 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const exec_1 = __nccwpck_require__(5236);
 const INSTALL_STEP = 'install';
 const BUILD_STEP = 'build';
+// Used when no clean_script is provided. It removes the untracked and ignored build output so
+// that a run never measures artifacts left behind by the previous one. Dependencies and dot
+// entries (local configuration and build tool caches) are excluded from the clean.
+const DEFAULT_CLEAN_SCRIPT = 'git clean -fdx -e node_modules -e .*';
 class Term {
+    clean(cleanScript, directory) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const scriptToExec = cleanScript || DEFAULT_CLEAN_SCRIPT;
+            console.log('clean', scriptToExec, directory);
+            try {
+                yield (0, exec_1.exec)(scriptToExec, [], {
+                    cwd: directory,
+                });
+            }
+            catch (error) {
+                // A clean_script is the consumer's own contract, so its failure stays fatal. The default
+                // one is not, it must not break repositories where it cannot run.
+                if (cleanScript) {
+                    throw error;
+                }
+                console.log('Clean failed', error.message);
+            }
+        });
+    }
     execSizeLimit(skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, isMonorepo) {
         return __awaiter(this, void 0, void 0, function* () {
             let output = '';
@@ -30269,27 +30297,30 @@ class Term {
             }
             if (skipStep !== BUILD_STEP) {
                 const scriptToExec = buildScript || 'build';
+                yield this.clean(cleanScript, directory);
                 console.log('build', scriptToExec, directory);
                 yield (0, exec_1.exec)(scriptToExec, [], {
                     cwd: directory,
                 });
             }
             console.log('check', script, directory);
-            const status = yield (0, exec_1.exec)(script, [], {
-                windowsVerbatimArguments,
-                ignoreReturnCode: true,
-                listeners: {
-                    stdout: (data) => {
-                        output += data.toString();
+            let status;
+            try {
+                status = yield (0, exec_1.exec)(script, [], {
+                    windowsVerbatimArguments,
+                    ignoreReturnCode: true,
+                    listeners: {
+                        stdout: (data) => {
+                            output += data.toString();
+                        },
                     },
-                },
-                cwd: directory,
-            });
-            if (cleanScript) {
-                console.log('clean', cleanScript, directory);
-                yield (0, exec_1.exec)(cleanScript, [], {
                     cwd: directory,
                 });
+            }
+            finally {
+                if (cleanScript) {
+                    yield this.clean(cleanScript, directory);
+                }
             }
             if (isMonorepo) {
                 output = JSON.stringify(output
@@ -30405,7 +30436,14 @@ function run() {
                 }
             }
             if (status > 0) {
-                (0, core_1.setFailed)('Size limit has been exceeded.');
+                // The status is the exit code of the whole size check script, so a build error or a bad
+                // configuration must not be reported as a size limit breach.
+                if (limit.hasExceededLimits(current)) {
+                    (0, core_1.setFailed)('Size limit has been exceeded.');
+                }
+                else {
+                    (0, core_1.setFailed)(`The size check script failed with exit code ${status}. No size limit breach was found in its output, check the logs for the actual failure.`);
+                }
             }
         }
         catch (error) {

@@ -4,6 +4,7 @@ interface IResult {
   name: string;
   size: number;
   sizeLimit?: number;
+  passed?: boolean;
   running?: number;
   loading?: number;
   total?: number;
@@ -149,10 +150,20 @@ class SizeLimit {
           name: result.name,
           size: +result.size,
           sizeLimit: +result.sizeLimit,
+          passed: result.passed,
           ...time,
         },
       };
     }, {});
+  }
+
+  hasExceededLimits(results: { [name: string]: IResult }): boolean {
+    // size-limit reports passed for every entry that has a limit, size or time based. The size
+    // comparison is the fallback for outputs that do not carry the flag.
+    return Object.keys(results).some(
+      (name: string) =>
+        results[name].passed === false || results[name].size > results[name].sizeLimit,
+    );
   }
 
   formatResults(
