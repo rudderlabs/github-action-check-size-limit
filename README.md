@@ -65,9 +65,9 @@ with:
   skip_step: install
 ```
 
-The action measures the pull request and then its base branch in the same checkout, so it cleans the build output before each build to make sure neither run measures the artifacts of the other. By default it runs `git clean -fdx -e node_modules -e .*`, which removes untracked and ignored build output while keeping dependencies, local configuration and build tool caches (anything under `node_modules` or starting with a dot). Note that this does not invalidate the cache of a build tool: a cached build is still restored into the cleaned output directory.
+The action measures the pull request and then its base branch in the same checkout, so it cleans the build output to make sure neither run measures the artifacts of the other. With no `clean_script` set it runs `git clean -fdx -e node_modules -e .*` before each build, which removes untracked and ignored build output while keeping dependencies, local configuration and build tool caches (anything under `node_modules` or starting with a dot). Note that this does not invalidate the cache of a build tool: a cached build is still restored into the cleaned output directory.
 
-Add `clean_script` option to replace that default with your own npm script. It runs before each build and, as before, after size-limit results are collected, which is useful to clean up leftover assets.
+Add `clean_script` option to replace that default with your own npm script. It runs after size-limit results are collected, which is useful to clean up leftover assets and is why it may also remove dependencies. It now runs even when the size-limit script fails.
 
 ```yaml
 with:

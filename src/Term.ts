@@ -29,6 +29,10 @@ class Term {
     }
   }
 
+  // A clean_script is documented to run after the results are collected and may remove anything,
+  // dependencies included, so it keeps that placement. The default clean runs before the build
+  // instead, because that is the only moment where output of an earlier run can still be measured.
+
   async execSizeLimit(
     skipStep?: string,
     installScript?: string,
@@ -53,7 +57,9 @@ class Term {
     if (skipStep !== BUILD_STEP) {
       const scriptToExec = buildScript || 'build';
 
-      await this.clean(cleanScript, directory);
+      if (!cleanScript) {
+        await this.clean(cleanScript, directory);
+      }
 
       console.log('build', scriptToExec, directory);
       await exec(scriptToExec, [], {

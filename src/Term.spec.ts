@@ -53,7 +53,16 @@ describe('Term', () => {
     expect(output).toBe(RESULTS);
   });
 
-  test('should run a custom clean script before the build and after the check', async () => {
+  test('should not run the default clean when the build step is skipped', async () => {
+    const term = new Term();
+
+    await term.execSizeLimit('build', null, null, null, false, 'client', CHECK_SCRIPT, false);
+
+    expect(executedScripts()).toEqual([CHECK_SCRIPT]);
+  });
+
+  test('should run a custom clean script after the check only', async () => {
+    // a clean_script may remove dependencies, so it must never run before the build
     const term = new Term();
 
     await term.execSizeLimit(
@@ -67,13 +76,7 @@ describe('Term', () => {
       false,
     );
 
-    expect(executedScripts()).toEqual([
-      'ci',
-      CUSTOM_CLEAN_SCRIPT,
-      'build',
-      CHECK_SCRIPT,
-      CUSTOM_CLEAN_SCRIPT,
-    ]);
+    expect(executedScripts()).toEqual(['ci', 'build', CHECK_SCRIPT, CUSTOM_CLEAN_SCRIPT]);
   });
 
   test('should clean after the check even when the size script throws', async () => {
@@ -100,13 +103,7 @@ describe('Term', () => {
       ),
     ).rejects.toThrow('size script crashed');
 
-    expect(executedScripts()).toEqual([
-      'ci',
-      CUSTOM_CLEAN_SCRIPT,
-      'build',
-      CHECK_SCRIPT,
-      CUSTOM_CLEAN_SCRIPT,
-    ]);
+    expect(executedScripts()).toEqual(['ci', 'build', CHECK_SCRIPT, CUSTOM_CLEAN_SCRIPT]);
   });
 
   test('should not clean before the check when the build step is skipped', async () => {

@@ -30285,6 +30285,9 @@ class Term {
             }
         });
     }
+    // A clean_script is documented to run after the results are collected and may remove anything,
+    // dependencies included, so it keeps that placement. The default clean runs before the build
+    // instead, because that is the only moment where output of an earlier run can still be measured.
     execSizeLimit(skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, isMonorepo) {
         return __awaiter(this, void 0, void 0, function* () {
             let output = '';
@@ -30297,7 +30300,9 @@ class Term {
             }
             if (skipStep !== BUILD_STEP) {
                 const scriptToExec = buildScript || 'build';
-                yield this.clean(cleanScript, directory);
+                if (!cleanScript) {
+                    yield this.clean(cleanScript, directory);
+                }
                 console.log('build', scriptToExec, directory);
                 yield (0, exec_1.exec)(scriptToExec, [], {
                     cwd: directory,
