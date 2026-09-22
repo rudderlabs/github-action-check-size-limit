@@ -34,7 +34,7 @@ describe('Term', () => {
     });
   });
 
-  test('should clean the build output before the build when no clean script is given', async () => {
+  test('should clean before the install when no clean script is given', async () => {
     const term = new Term();
 
     const { status, output } = await term.execSizeLimit(
@@ -48,9 +48,19 @@ describe('Term', () => {
       false,
     );
 
-    expect(executedScripts()).toEqual(['ci', DEFAULT_CLEAN_SCRIPT, 'build', CHECK_SCRIPT]);
+    // Install scripts can generate ignored files the build needs, so the clean
+    // has to precede the install rather than sit between install and build.
+    expect(executedScripts()).toEqual([DEFAULT_CLEAN_SCRIPT, 'ci', 'build', CHECK_SCRIPT]);
     expect(status).toBe(0);
     expect(output).toBe(RESULTS);
+  });
+
+  test('should still clean before the build when the install step is skipped', async () => {
+    const term = new Term();
+
+    await term.execSizeLimit('install', null, null, null, false, 'client', CHECK_SCRIPT, false);
+
+    expect(executedScripts()).toEqual([DEFAULT_CLEAN_SCRIPT, 'build', CHECK_SCRIPT]);
   });
 
   test('should not run the default clean when the build step is skipped', async () => {

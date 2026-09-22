@@ -30286,11 +30286,18 @@ class Term {
         });
     }
     // A clean_script is documented to run after the results are collected and may remove anything,
-    // dependencies included, so it keeps that placement. The default clean runs before the build
-    // instead, because that is the only moment where output of an earlier run can still be measured.
+    // dependencies included, so it keeps that placement. The default clean runs first instead, so a
+    // run never measures the previous one's output and never deletes what the install just generated.
     execSizeLimit(skipStep, installScript, buildScript, cleanScript, windowsVerbatimArguments, directory, script, isMonorepo) {
         return __awaiter(this, void 0, void 0, function* () {
             let output = '';
+            // Before the install, not between install and build: install scripts can
+            // generate ignored files the build needs, and the default clean removes
+            // ignored files. Skipped when the build is, because then the artifacts being
+            // measured are the ones already on disk.
+            if (!cleanScript && skipStep !== BUILD_STEP) {
+                yield this.clean(cleanScript, directory);
+            }
             if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
                 const scriptToExec = installScript || 'ci';
                 console.log('install', scriptToExec, directory);
@@ -30300,9 +30307,6 @@ class Term {
             }
             if (skipStep !== BUILD_STEP) {
                 const scriptToExec = buildScript || 'build';
-                if (!cleanScript) {
-                    yield this.clean(cleanScript, directory);
-                }
                 console.log('build', scriptToExec, directory);
                 yield (0, exec_1.exec)(scriptToExec, [], {
                     cwd: directory,
