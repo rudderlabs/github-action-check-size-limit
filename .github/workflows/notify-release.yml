@@ -1,0 +1,58 @@
+name: Notify release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: notify-release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  notify-slack:
+    name: Notify Slack
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      # There is nothing to publish here -- the GitHub release is the release,
+      # since consumers reference the action by tag. So this reports the release
+      # itself rather than the outcome of a downstream publish step, and there
+      # is no failure branch for a step that does not exist.
+      - name: Send release message to Slack channel
+        uses: slackapi/slack-github-action@007b2c3c751a190b6f0f040e47ed024deaa72844 # v1.23.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          PROJECT_NAME: Size Limit Action
+        with:
+          channel-id: ${{ secrets.SLACK_RELEASE_CHANNEL_ID }}
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "New release: ${{ env.PROJECT_NAME }}"
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Release: <${{ github.event.release.html_url }}|${{ github.event.release.tag_name }}>*\n*Pin by SHA:* `rudderlabs/github-action-check-size-limit@${{ github.sha }} # ${{ github.event.release.tag_name }}`"
+                  }
+                }
+              ]
+            }
