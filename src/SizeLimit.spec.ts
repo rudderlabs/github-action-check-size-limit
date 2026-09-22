@@ -21,6 +21,7 @@ describe('SizeLimit', () => {
         running: 0.10210999999999999,
         size: 110894,
         sizeLimit: NaN,
+        passed: true,
         total: 2.2680084375000003,
       },
     });
@@ -42,6 +43,7 @@ describe('SizeLimit', () => {
         name: 'dist/index.js',
         size: 110894,
         sizeLimit: 120000,
+        passed: true,
       },
     });
   });
@@ -76,16 +78,19 @@ describe('SizeLimit', () => {
         name: 'dist/index.js',
         size: 110894,
         sizeLimit: NaN,
+        passed: true,
       },
       'dist/new.js': {
         name: 'dist/new.js',
         size: 100894,
         sizeLimit: NaN,
+        passed: true,
       },
       'dist/old.js': {
         name: 'dist/old.js',
         size: 100894,
         sizeLimit: NaN,
+        passed: true,
       },
     });
   });
@@ -216,5 +221,64 @@ describe('SizeLimit', () => {
       SizeLimit.SIZE_RESULTS_HEADER,
       ['dist/index.js', '118.06 KB', '9.77 KB (+9.02% 🔺)', '107.42 KB (10.64 KB ❌)'],
     ]);
+  });
+
+  test('should detect a size limit breach', () => {
+    const limit = new SizeLimit();
+    const results = {
+      'dist/index.js': {
+        name: 'dist/index.js',
+        passed: false,
+        size: 120894,
+        sizeLimit: 110000,
+      },
+    };
+
+    expect(limit.hasExceededLimits(results)).toBe(true);
+  });
+
+  test('should detect a time limit breach', () => {
+    // size-limit reports no sizeLimit for time based limits, only the passed flag
+    const limit = new SizeLimit();
+    const results = {
+      'dist/index.js': {
+        name: 'dist/index.js',
+        passed: false,
+        size: 110894,
+        sizeLimit: NaN,
+        running: 0.10210999999999999,
+        loading: 2.1658984375,
+        total: 2.2680084375000003,
+      },
+    };
+
+    expect(limit.hasExceededLimits(results)).toBe(true);
+  });
+
+  test('should not detect a breach when every entry is within its limit', () => {
+    const limit = new SizeLimit();
+    const results = {
+      'dist/index.js': {
+        name: 'dist/index.js',
+        passed: true,
+        size: 100894,
+        sizeLimit: 110000,
+      },
+    };
+
+    expect(limit.hasExceededLimits(results)).toBe(false);
+  });
+
+  test('should not detect a breach when no limits are configured', () => {
+    const limit = new SizeLimit();
+    const results = {
+      'dist/index.js': {
+        name: 'dist/index.js',
+        size: 100894,
+        sizeLimit: NaN,
+      },
+    };
+
+    expect(limit.hasExceededLimits(results)).toBe(false);
   });
 });

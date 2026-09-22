@@ -20,7 +20,7 @@ inputs:
     description: 'a custom npm script to build'
   clean_script:
     required: false
-    description: 'a npm script to clean up build directory'
+    description: 'a npm script to clean up build directory, it replaces the default clean and runs after the size-limit results are collected'
   skip_step:
     required: false
     description: 'which step to skip, either "install" or "build"'

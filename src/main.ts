@@ -137,7 +137,15 @@ async function run() {
     }
 
     if (status > 0) {
-      setFailed('Size limit has been exceeded.');
+      // The status is the exit code of the whole size check script, so a build error or a bad
+      // configuration must not be reported as a size limit breach.
+      if (limit.hasExceededLimits(current)) {
+        setFailed('Size limit has been exceeded.');
+      } else {
+        setFailed(
+          `The size check script failed with exit code ${status}. No size limit breach was found in its output, check the logs for the actual failure.`,
+        );
+      }
     }
   } catch (error) {
     setFailed(error.message);
