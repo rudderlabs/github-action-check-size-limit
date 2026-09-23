@@ -44,7 +44,7 @@
     "@size-limit/webpack": "11.2.0",
     "@types/bytes": "3.1.6",
     "@types/jest": "30.0.0",
-    "@types/node": "24.0.14",
+    "@types/node": "26.6.0",
     "@typescript-eslint/eslint-plugin": "8.70.0",
     "@typescript-eslint/parser": "8.70.0",
     "@vercel/ncc": "0.45.0",
