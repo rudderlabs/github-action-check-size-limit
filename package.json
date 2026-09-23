@@ -41,7 +41,7 @@
     "@eslint/js": "10.0.1",
     "@size-limit/file": "11.2.0",
     "@size-limit/time": "11.2.0",
-    "@size-limit/webpack": "11.2.0",
+    "@size-limit/webpack": "14.0.0",
     "@types/bytes": "3.1.6",
     "@types/jest": "30.0.0",
     "@types/node": "26.6.0",
