@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.2](https://github.com/rudderlabs/github-action-check-size-limit/compare/v3.0.1...v3.0.2) (2026-10-15)
+
+
+### Miscellaneous
+
+* **deps-dev:** bump @eslint/js from 9.31.0 to 10.0.1 ([#40](https://github.com/rudderlabs/github-action-check-size-limit/issues/40)) ([8532792](https://github.com/rudderlabs/github-action-check-size-limit/commit/8532792907cea14d378f2ee9b576d44def05fd97))
+* **deps-dev:** bump @types/node from 24.0.14 to 26.6.0 ([#46](https://github.com/rudderlabs/github-action-check-size-limit/issues/46)) ([4d165c8](https://github.com/rudderlabs/github-action-check-size-limit/commit/4d165c8af11222eb2f6e26e895921fc9f123536f))
+* **deps-dev:** bump eslint from 9.31.0 to 10.10.0 ([#42](https://github.com/rudderlabs/github-action-check-size-limit/issues/42)) ([f8e5634](https://github.com/rudderlabs/github-action-check-size-limit/commit/f8e5634b17a5324d5b37dfc249e093c85542674e))
+* **deps-dev:** bump handlebars from 4.7.9 to 4.7.10 ([#54](https://github.com/rudderlabs/github-action-check-size-limit/issues/54)) ([73398dc](https://github.com/rudderlabs/github-action-check-size-limit/commit/73398dcd8c2d1294029318caa6bb3ebaf79181e3))
+* **deps:** bump the github-actions-minor-patch group with 2 updates ([#53](https://github.com/rudderlabs/github-action-check-size-limit/issues/53)) ([7f2089c](https://github.com/rudderlabs/github-action-check-size-limit/commit/7f2089cd842f0a65e89e06d46113a9fd1d0d4207))
+
 ## [3.0.1](https://github.com/rudderlabs/github-action-check-size-limit/compare/v3.0.0...v3.0.1) (2026-09-22)
 
 
